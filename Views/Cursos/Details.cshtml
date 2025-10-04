@@ -1,0 +1,19 @@
+@model EXAPARCIAL_PONCE.Models.Curso
+@{
+    ViewData["Title"] = "Detalle del Curso";
+}
+
+<h2>@Model.Nombre</h2>
+<hr />
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Codigo</h5>
+        <p class="card-text"><strong>Créditos:</strong> @Model.Creditos</p>
+        <p class="card-text"><strong>Horario:</strong> @Model.HorarioInicio.ToString(@"hh\:mm") - @Model.HorarioFin.ToString(@"hh\:mm")</p>
+        <p class="card-text"><strong>Cupo Máximo:</strong> @Model.CupoMaximo</p>
+        <p class="card-text"><strong>Estado:</strong> @(Model.Activo ? "Activo" : "Inactivo")</p>
+        <a href="#" class="btn btn-success">Inscribirse</a>
+        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
