@@ -1,0 +1,44 @@
+@model IEnumerable<EXAPARCIAL_PONCE.Models.Matricula>
+@{
+    ViewData["Title"] = "Matrículas del curso " + ViewBag.CursoNombre;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Fecha Registro</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var m in Model)
+    {
+        <tr>
+            <td>@m.UsuarioId</td>
+            <td>@m.FechaRegistro</td>
+            <td>@m.Estado</td>
+            <td>
+                @if (m.Estado == "Pendiente")
+                {
+                    <form asp-action="Confirmar" asp-route-id="@m.Id" method="post" class="d-inline">
+                        <button class="btn btn-sm btn-success">Confirmar</button>
+                    </form>
+                    <form asp-action="Cancelar" asp-route-id="@m.Id" method="post" class="d-inline">
+                        <button class="btn btn-sm btn-danger">Cancelar</button>
+                    </form>
+                }
+                else
+                {
+                    <span class="text-muted">Sin acciones</span>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

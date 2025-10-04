@@ -1,6 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
 @{
     var ultimoCursoId = HttpContextAccessor.HttpContext?.Session.GetInt32("UltimoCursoId");
     var ultimoCursoNombre = HttpContextAccessor.HttpContext?.Session.GetString("UltimoCursoNombre");
@@ -21,7 +25,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EXAPARCIAL_PONCE</a>
+                <a class="navbar-brand fw-bold text-danger" asp-area="" asp-controller="Home" asp-action="Index">EXAPARCIAL_PONCE</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -38,6 +42,16 @@
                             <a class="nav-link text-dark" asp-controller="Cursos" asp-action="Index">Catálogo de Cursos</a>
                         </li>
 
+                        @* 🔹 Solo visible para usuarios con rol Coordinador *@
+                        @if (User.IsInRole("Coordinador"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-primary fw-bold" asp-controller="Coordinador" asp-action="Index">
+                                    Panel Coordinador
+                                </a>
+                            </li>
+                        }
+
                         @* 🔹 Enlace dinámico “Volver al curso” *@
                         @if (ultimoCursoId != null && !string.IsNullOrEmpty(ultimoCursoNombre))
                         {
@@ -53,17 +67,20 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - EXAPARCIAL_PONCE - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer text-muted mt-4">
+        <div class="container text-center">
+            &copy; 2025 - EXAPARCIAL_PONCE - 
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
