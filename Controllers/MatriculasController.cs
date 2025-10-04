@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EXAPARCIAL_PONCE.Controllers
 {
-    [Authorize] // el usuario debe estar autenticado
+    [Authorize]
     public class MatriculasController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,51 +19,55 @@ namespace EXAPARCIAL_PONCE.Controllers
             _userManager = userManager;
         }
 
-        // Acción para inscribirse a un curso
         [HttpPost]
         public async Task<IActionResult> Inscribirse(int cursoId)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-                return Unauthorized();
+            {
+                TempData["Error"] = "Debes iniciar sesión para inscribirte.";
+                return RedirectToAction("Details", "Cursos", new { id = cursoId });
+            }
 
-            var curso = await _context.Cursos.FirstOrDefaultAsync(c => c.Id == cursoId && c.Activo);
+            var curso = await _context.Cursos.FindAsync(cursoId);
             if (curso == null)
-                return NotFound("El curso no existe o está inactivo.");
+            {
+                TempData["Error"] = "El curso no existe.";
+                return RedirectToAction("Index", "Cursos");
+            }
 
-            // Validación: ya matriculado
-            bool yaMatriculado = await _context.Matriculas.AnyAsync(m => m.CursoId == cursoId && m.UsuarioId == user.Id);
+            int matriculados = await _context.Matriculas
+                .CountAsync(m => m.CursoId == cursoId && m.Estado != "Cancelada");
+            if (matriculados >= curso.CupoMaximo)
+            {
+                TempData["Error"] = "El curso ya alcanzó su cupo máximo.";
+                return RedirectToAction("Details", "Cursos", new { id = cursoId });
+            }
+
+            bool yaMatriculado = await _context.Matriculas
+                .AnyAsync(m => m.CursoId == cursoId && m.UsuarioId == user.Id);
             if (yaMatriculado)
             {
                 TempData["Error"] = "Ya estás matriculado en este curso.";
                 return RedirectToAction("Details", "Cursos", new { id = cursoId });
             }
 
-            // Validación: cupo máximo
-            int inscritos = await _context.Matriculas.CountAsync(m => m.CursoId == cursoId);
-            if (inscritos >= curso.CupoMaximo)
-            {
-                TempData["Error"] = "El curso ya alcanzó su cupo máximo.";
-                return RedirectToAction("Details", "Cursos", new { id = cursoId });
-            }
-
-            // Validación: conflicto de horario
-            var matriculasUsuario = await _context.Matriculas
+            var cursosActuales = await _context.Matriculas
                 .Include(m => m.Curso)
-                .Where(m => m.UsuarioId == user.Id)
+                .Where(m => m.UsuarioId == user.Id && m.Estado != "Cancelada")
                 .ToListAsync();
 
-            bool conflictoHorario = matriculasUsuario.Any(m =>
-                (curso.HorarioInicio < m.Curso.HorarioFin && curso.HorarioFin > m.Curso.HorarioInicio));
+            bool solapado = cursosActuales.Any(m =>
+                curso.HorarioInicio < m.Curso.HorarioFin &&
+                curso.HorarioFin > m.Curso.HorarioInicio);
 
-            if (conflictoHorario)
+            if (solapado)
             {
-                TempData["Error"] = "Ya tienes una matrícula en un curso que se cruza en horario.";
+                TempData["Error"] = "Tienes un curso en el mismo horario.";
                 return RedirectToAction("Details", "Cursos", new { id = cursoId });
             }
 
-            // Si todo OK -> registrar matrícula
-            var matricula = new Matricula
+            var nuevaMatricula = new Matricula
             {
                 CursoId = cursoId,
                 UsuarioId = user.Id,
@@ -71,10 +75,10 @@ namespace EXAPARCIAL_PONCE.Controllers
                 FechaRegistro = DateTime.Now
             };
 
-            _context.Matriculas.Add(matricula);
+            _context.Matriculas.Add(nuevaMatricula);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Te has inscrito exitosamente en el curso.";
+            TempData["Success"] = "Te has inscrito correctamente en el curso. Estado: Pendiente.";
             return RedirectToAction("Details", "Cursos", new { id = cursoId });
         }
     }
