@@ -6,6 +6,16 @@
 <h2>@Model.Nombre</h2>
 <hr />
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
 <div class="card shadow-sm">
     <div class="card-body">
         <h5 class="card-title">@Model.Codigo</h5>
@@ -13,7 +23,19 @@
         <p class="card-text"><strong>Horario:</strong> @Model.HorarioInicio.ToString(@"hh\:mm") - @Model.HorarioFin.ToString(@"hh\:mm")</p>
         <p class="card-text"><strong>Cupo Máximo:</strong> @Model.CupoMaximo</p>
         <p class="card-text"><strong>Estado:</strong> @(Model.Activo ? "Activo" : "Inactivo")</p>
-        <a href="#" class="btn btn-success">Inscribirse</a>
-        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <form asp-controller="Matriculas" asp-action="Inscribirse" method="post">
+                <input type="hidden" name="cursoId" value="@Model.Id" />
+                <button type="submit" class="btn btn-success mt-3">Inscribirse</button>
+            </form>
+        }
+        else
+        {
+            <p class="text-muted">Inicia sesión para inscribirte en este curso.</p>
+        }
+
+        <a asp-action="Index" class="btn btn-secondary mt-2">Volver</a>
     </div>
 </div>
