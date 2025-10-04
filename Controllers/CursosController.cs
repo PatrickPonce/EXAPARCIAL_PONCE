@@ -37,17 +37,20 @@ namespace EXAPARCIAL_PONCE.Controllers
             return View(cursos);
         }
 
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null) return NotFound();
+            var curso = await _context.Cursos.FindAsync(id);
+            if (curso == null)
+            {
+                return NotFound();
+            }
 
-            var curso = await _context.Cursos
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            if (curso == null) return NotFound();
+            HttpContext.Session.SetInt32("UltimoCursoId", curso.Id);
+            HttpContext.Session.SetString("UltimoCursoNombre", curso.Nombre);
 
             return View(curso);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
