@@ -1,0 +1,41 @@
+@model IEnumerable<EXAPARCIAL_PONCE.Models.Curso>
+@{
+    ViewData["Title"] = "Panel del Coordinador";
+}
+
+<h2>@ViewData["Title"]</h2>
+<a asp-action="Crear" class="btn btn-primary mb-3">➕ Crear nuevo curso</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Créditos</th>
+            <th>Horario</th>
+            <th>Activo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model)
+    {
+        <tr>
+            <td>@c.Codigo</td>
+            <td>@c.Nombre</td>
+            <td>@c.Creditos</td>
+            <td>@c.HorarioInicio - @c.HorarioFin</td>
+            <td>@(c.Activo ? "Sí" : "No")</td>
+            <td>
+                <a asp-action="Editar" asp-route-id="@c.Id" class="btn btn-sm btn-warning">Editar</a>
+                <form asp-action="Desactivar" asp-route-id="@c.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-secondary">
+                        @(c.Activo ? "Desactivar" : "Activar")
+                    </button>
+                </form>
+                <a asp-action="Matriculas" asp-route-id="@c.Id" class="btn btn-sm btn-info">Matrículas</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

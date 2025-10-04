@@ -1,0 +1,54 @@
+@model EXAPARCIAL_PONCE.Models.Curso
+@{
+    ViewData["Title"] = "Crear curso";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Crear" method="post" class="card p-4 shadow-sm">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Codigo" class="form-label"></label>
+        <input asp-for="Codigo" class="form-control" />
+        <span asp-validation-for="Codigo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <label asp-for="Creditos"></label>
+            <input asp-for="Creditos" class="form-control" />
+            <span asp-validation-for="Creditos" class="text-danger"></span>
+        </div>
+        <div class="col">
+            <label asp-for="CupoMaximo"></label>
+            <input asp-for="CupoMaximo" class="form-control" />
+            <span asp-validation-for="CupoMaximo" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col">
+            <label asp-for="HorarioInicio"></label>
+            <input asp-for="HorarioInicio" type="time" class="form-control" />
+        </div>
+        <div class="col">
+            <label asp-for="HorarioFin"></label>
+            <input asp-for="HorarioFin" type="time" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="Activo" class="form-check-input" />
+        <label asp-for="Activo" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
