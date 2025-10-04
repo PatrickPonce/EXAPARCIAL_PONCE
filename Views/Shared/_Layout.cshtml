@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var ultimoCursoId = HttpContextAccessor.HttpContext?.Session.GetInt32("UltimoCursoId");
+    var ultimoCursoNombre = HttpContextAccessor.HttpContext?.Session.GetString("UltimoCursoNombre");
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -29,6 +37,16 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Cursos" asp-action="Index">Catálogo de Cursos</a>
                         </li>
+
+                        @* 🔹 Enlace dinámico “Volver al curso” *@
+                        @if (ultimoCursoId != null && !string.IsNullOrEmpty(ultimoCursoNombre))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-warning" asp-controller="Cursos" asp-action="Details" asp-route-id="@ultimoCursoId">
+                                    Volver al curso @ultimoCursoNombre
+                                </a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
